@@ -8,10 +8,13 @@ const connection = mysql.createConnection({
   password: "salman@2003",
 });
 
-let q = "INSERT INTO user(id,username,email,password)VALUES(?,?,?,?)";
-let user = ["123", "123_newuser", "abc12@gmai.com", "abc"];
+let q = "INSERT INTO user(id,username,email,password)VALUES ?";
+let users = [
+  ["123a", "123_newusera", "abc12@gmai.coma", "abca"],
+  ["123b", "123_newuserb", "abc12@gmai.comb", "abcb"],
+];
 try {
-  connection.query(q, user, (err, result) => {
+  connection.query(q, [users], (err, result) => {
     if (err) throw err;
     console.log(result); // results contains rows returned by server
     console.log(result.length);
