@@ -2,10 +2,11 @@ const { faker } = require("@faker-js/faker");
 const mysql = require("mysql2");
 const express = require("express");
 const app = express();
+const path = require("path");
 
 app.set("view engine", "ejs");
 
-app.use("views", Path.join(__dirname, "/views"));
+app.set("views", path.join(__dirname, "/views"));
 
 const port = 8080;
 
@@ -32,12 +33,29 @@ app.get("/", (req, res) => {
     connection.query(q, (err, result) => {
       if (err) throw err;
       console.log(result[0]["COUNT(*)"]); // results contains rows returned by server
-      res.send("sucess");
+      let count = result[0]["COUNT(*)"];
+      res.render("home.ejs", { count });
     });
   } catch (err) {
     console.log(err);
   }
   // connection.end();
+});
+
+// show route
+app.get("/user", (req, res) => {
+  let q = "SELECT *FROM user";
+
+  try {
+    connection.query(q, (err, result) => {
+      if (err) throw err;
+      let users = result;
+      // res.render("user.ejs", data);
+      res.render("user.ejs", { users });
+    });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.listen(port, () => {
