@@ -6,6 +6,8 @@ const path = require("path");
 const methodOverride = require("method-override");
 
 app.use(methodOverride("_method"));
+
+// to parse form data that we enter throught edit form
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -61,7 +63,7 @@ app.get("/user", (req, res) => {
   }
 });
 
-// edit uername
+// edit username
 app.get("/user/:id/edit", (req, res) => {
   let { id } = req.params;
   let q = `SELECT * FROM user where id="${id}"`;
@@ -77,8 +79,29 @@ app.get("/user/:id/edit", (req, res) => {
   }
 });
 
+// update (DB) route
 app.patch("/user/:id", (req, res) => {
-  res.send("updated");
+  let { id } = req.params;
+  let q = `SELECT * FROM user where id="${id}"`;
+  let { password: formpassword, username: formusername } = req.body;
+  try {
+    connection.query(q, (err, result) => {
+      if (err) throw err;
+      let user = result[0];
+      if (formpassword != user.password) {
+        res.send("wrong password");
+      } else {
+        let q2 = `UPDATE user SET username="${formusername}" WHERE id="${id}"`;
+        connection.query(q2, (err, result) => {
+          if (err) throw err;
+          res.redirect("/user");
+        });
+      }
+    });
+  } catch (err) {
+    console.log(err);
+  }
+  // res.send("updated");
 });
 
 app.listen(port, () => {
