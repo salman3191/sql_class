@@ -84,6 +84,7 @@ app.get("/user/:id/edit", (req, res) => {
 // update (DB) route
 app.patch("/user/:id", (req, res) => {
   let { id } = req.params;
+  // console.log(req.params);
   let q = `SELECT * FROM user where id="${id}"`;
   let { password: formpassword, username: formusername } = req.body;
   try {
@@ -123,6 +124,37 @@ app.post("/user/username/email/password", (req, res) => {
   // res.send("server working well");
 });
 
+app.get("/user/:id/delete", (req, res) => {
+  let { id } = req.params;
+  let q5 = `SELECT *FROM user WHERE id="${id}"`;
+  connection.query(q5, (err, result) => {
+    if (err) throw err;
+    let user = result[0];
+    // console.log(user);
+    res.render("delete.ejs", { user });
+  });
+  // res.render("delete.ejs", { id });
+});
+
+app.patch("/user/:id/email/password", (req, res) => {
+  let { id } = req.params;
+
+  let { email: newemail, password: newpassword } = req.body;
+  let q4 = `SELECT *FROM user WHERE id="${id}"`;
+  connection.query(q4, (err, result) => {
+    if (err) throw err;
+    let user = result[0];
+    console.log(user.password);
+    if (newemail != user.email) {
+      res.render("no such user found");
+    } else {
+      let q6 = ` DELETE FROM User WHERE id ="${user.id}" LIMIT 1`;
+      connection.query(q6, (err, result) => {
+        res.redirect("/user");
+      });
+    }
+  });
+});
 app.listen(port, () => {
   console.log("server is listening to port 8080");
 });
